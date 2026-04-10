@@ -1,15 +1,5 @@
-.navStyle {
-    background-color: var(--ddn-theme-850);
-}
-.nav-item {
-    --bs-navbar-hover-color: var(--ddn-theme-400);
-    --bs-nav-link-hover-color: var(--ddn-theme-400);
-}
-
-.dropdown-menu{
-    background-color: var(--ddn-theme-900);
-}
-
-.dropdown:has(.nav-link.active) .dropdown-toggle {
-    color: var(--bs-navbar-active-color);
+.homeStyle {
+    background: linear-gradient(to right, rgba(181,53,132,0.95) 0%, rgba(8,7,102,0.8) 40%, rgba(8,7,102,0.95) 100%),
+        url("/images/mw1920_NowPlayingBG.jpg");
+    color: var(--ddn-light-color);
 }
