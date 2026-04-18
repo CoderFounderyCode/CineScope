@@ -1,10 +1,6 @@
 ﻿@page "/nowplaying"
 
-@using System.Net.Http.Json
-@using System.Text.Json
-
-@inject HttpClient http
-@inject IConfiguration configuration
+@inject TMDBService TMDBService
 
 <PageTitle>CineScope-Now Playing</PageTitle>
 
@@ -20,7 +16,7 @@
     </p>
 
        
-    <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4">
+    <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
 
         @if (nowPlayingMovies is null)
         {
@@ -52,45 +48,25 @@
 
 @code {
     private MovieListResponse? nowPlayingMovies;
-    private string? tmdbApiKey;
     private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
-
+        try
         {
-            tmdbApiKey = configuration["TmdbAccessKey"];
+            isLoading = true;
+            nowPlayingMovies = await TMDBService.GetNowPlayingMovies();
 
-            if (!string.IsNullOrEmpty(tmdbApiKey))
-            {
-                string apiUrl = $"https://api.themoviedb.org/3/movie/now_playing?region=GB&languages=en";
-                string imageBaseUrl = "https://image.tmdb.org/t/p/w500";
-
-                http.DefaultRequestHeaders.Authorization = new("Bearer", tmdbApiKey);
-
-                MovieListResponse response = await http.GetFromJsonAsync<MovieListResponse>(apiUrl)
-                                ?? throw new HttpIOException(HttpRequestError.InvalidResponse, "Failed to load now playing movies");
-
-                // Results is the property that contains the list of movies in the response from the class MovieListResponse
-                foreach (var movie in response.Results)
-                {
-                    if (string.IsNullOrEmpty(movie.PosterPath))
-                    {
-                        movie.PosterPath = "/images/poster.png";
-                    }
-                    else
-                    {
-                        movie.PosterPath = $"{imageBaseUrl}{movie.PosterPath}";
-                    }
-                }
-                nowPlayingMovies = response;
-            }
-            else
-            {
-                Console.WriteLine("TMDB API key is missing in configuration.");
-                isLoading = false;
-            }
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
         }
 
     }
+
 }

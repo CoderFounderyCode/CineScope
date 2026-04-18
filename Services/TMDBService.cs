@@ -8,9 +8,9 @@ namespace CineScope.Services
     {
         private readonly HttpClient _http;
 
-        public TMDBService(HttpClient _http, IConfiguration config)
+        public TMDBService(HttpClient http, IConfiguration config)
         {
-            _http = _http;
+            _http = http;
 
             string tmdbApiKey = config["TmdbAccessKey"];
             if (!string.IsNullOrEmpty(tmdbApiKey))
@@ -18,9 +18,9 @@ namespace CineScope.Services
                 _http.DefaultRequestHeaders.Add("Authorization", $"Bearer {tmdbApiKey}");
             }
         }
-    }
 
-    public async Task<MovieListResponse> GetNowPlayingMovies()
+
+        public async Task<MovieListResponse> GetNowPlayingMovies()
         {
             string apiUrl = $"https://api.themoviedb.org/3/movie/now_playing?region=GB&languages=en";
             string imageBaseUrl = "https://image.tmdb.org/t/p/w500";
