@@ -47,5 +47,33 @@ namespace CineScope.Services
 
         }
 
+
+        public async Task<MovieListResponse> GetPopularMovies()
+        {
+            string apiUrl = $"https://api.themoviedb.org/3/movie/popular?region=GB&languages=en";
+            string imageBaseUrl = "https://image.tmdb.org/t/p/w500";
+
+
+            MovieListResponse response = await _http.GetFromJsonAsync<MovieListResponse>(apiUrl)
+                 ?? throw new HttpIOException(HttpRequestError.InvalidResponse, "Failed to load popular movies");
+
+
+            // Results is the property that contains the list of movies in the response from the class MovieListResponse
+            foreach (var movie in response.Results)
+            {
+                if (string.IsNullOrEmpty(movie.PosterPath))
+                {
+                    movie.PosterPath = "/images/poster.png";
+                }
+                else
+                {
+                    movie.PosterPath = $"{imageBaseUrl}{movie.PosterPath}";
+                }
+            }
+            return response;
+
+
+        }
+
     }
 }

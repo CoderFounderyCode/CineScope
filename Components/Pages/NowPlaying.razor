@@ -16,7 +16,6 @@
     </p>
 
        
-    <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
 
         @if (nowPlayingMovies is null)
         {
@@ -35,16 +34,19 @@
         }
         else
         {
+        <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
+
             @foreach (var movie in nowPlayingMovies.Results)
             {
                 <div class="col">
                     <MovieCard Movie="movie" />
                 </div>
             }
+            </div>
+
         }
     </div>
 
-</div>
 
 @code {
     private MovieListResponse? nowPlayingMovies;
