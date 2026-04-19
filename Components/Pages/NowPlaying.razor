@@ -1,9 +1,25 @@
-﻿@page "/nowplaying"
+﻿@* 
+    NowPlaying.razor - Page Component
+    Route: /nowplaying
+
+    This page fetches and displays movies currently playing in theaters using the TMDBService.
+
+    Lifecycle:
+    - OnInitializedAsync fires once when the page loads, calling TMDBService.GetNowPlayingMovies()
+    - isLoading controls a loading message while the API call is in progress
+    - If the API call fails, nowPlayingMovies remains null and an error message is shown
+
+    Rendering:
+    - While loading or on failure, a status message is displayed
+    - On success, movies are rendered in a responsive grid using the reusable MovieCard component
+    - Bootstrap grid classes (row-cols-*) control the number of columns at each breakpoint
+*@
+
+@page "/nowplaying"
 
 @inject TMDBService TMDBService
 
 <PageTitle>CineScope-Now Playing</PageTitle>
-
 
 <div class="container-xxl py-3">
 
@@ -15,60 +31,58 @@
         Movies that are currently playing in theaters. This section provides information about the latest releases and what's currently showing on the big screen. Whether you're looking for action, comedy, drama, or any other genre, you'll find the latest movies here to help you decide what to watch next.
     </p>
 
-       
-
-        @if (nowPlayingMovies is null)
-        {
-            <div class="d-flex justify-content-center align-items-center">
-                @if (isLoading)
-                {
-                    <h2 class="text-muted">Loading now playing movies...</h2>
-                }
-                else
-                {
-                    <h2 class="text-muted">
-                        Failed to load now playing movies
-                    </h2>
-                }
-            </div>
-        }
-        else
-        {
+    @if (nowPlayingMovies is null)
+    {
+        <div class="d-flex justify-content-center align-items-center">
+            @if (isLoading)
+            {
+                <h2 class="text-muted">Loading now playing movies...</h2>
+            }
+            else
+            {
+                <h2 class="text-muted">
+                    Failed to load now playing movies
+                </h2>
+            }
+        </div>
+    }
+    else
+    {
         <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
-
             @foreach (var movie in nowPlayingMovies.Results)
             {
                 <div class="col">
                     <MovieCard Movie="movie" />
                 </div>
             }
-            </div>
-
-        }
-    </div>
-
+        </div>
+    }
+</div>
 
 @code {
+    // Holds the API response containing the list of now playing movies
     private MovieListResponse? nowPlayingMovies;
+
+    // Tracks whether the API call is still in progress
     private bool isLoading = true;
 
+    // Runs once when the page first loads - fetches now playing movies from the TMDB API
     protected override async Task OnInitializedAsync()
     {
         try
         {
             isLoading = true;
             nowPlayingMovies = await TMDBService.GetNowPlayingMovies();
-
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
+            // If the API call fails, nowPlayingMovies stays null and the error UI is shown
             Console.WriteLine(ex.Message);
         }
         finally
         {
+            // Always set isLoading to false so the loading message is dismissed
             isLoading = false;
         }
-
     }
-
 }

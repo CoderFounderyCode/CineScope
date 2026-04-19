@@ -1,25 +1,99 @@
-﻿<div class="card h-100 movieCard">
+﻿@* 
+    MovieCard.razor - Reusable UI Component
+
+    Displays a single movie in a Bootstrap card layout, including:
+    - Movie poster image
+    - Title and formatted release date
+    - A toggle button to add/remove the movie from favourites
+    - A link to the movie detail page
+
+    Parameters:
+    - Movie: Required. The Movie object to display (passed in from a parent component like NowPlaying.razor)
+
+    Lifecycle:
+    - OnParametersSetAsync fires each time the Movie parameter is set or updated
+    - It checks FavouritesService to determine if this movie is already a favourite
+    - isFavourite is updated accordingly, which controls the button label
+
+    Favourites:
+    - ToggleFavourite() is called when the user clicks the favourite button
+    - If already a favourite, it removes it and sets isFavourite to false
+    - If not a favourite, it adds it and sets isFavourite to true
+*@
+
+@inject FavouritesService FavouritesService
+
+<div class="card h-100 movieCard">
+    {{!-- Movie poster pulled from the Movie's PosterPath URL --}}
     <img src="@Movie.PosterPath" class="card-img-top" alt="Movie Poster">
+
     <div class="card-body border-top border">
         <div class="card-title fw-bold lh1">
-           @Movie.Title
+            @Movie.Title
         </div>
+
         <div class="card-text lh-1 fst-italic">
+            @*
+                Attempt to parse the ReleaseDate string into a DateTime.
+                If parsing succeeds, format it as "Month DD, YYYY" (e.g. April 19, 2026).
+                If parsing fails (null or invalid string), display "Unknown" instead.
+            *@
             @{
                 var parsed = DateTime.TryParse(Movie.ReleaseDate, out var releaseDate);
             }
             Release Date: @(parsed ? releaseDate.ToString("MMMM dd, yyyy") : "Unknown")
         </div>
-      
     </div>
-    <div class="card-footer movieCardFooter d-flex justify-content-between">
-        <button class="btn btn-outline-primary">Add To Favs</button>
-        <a hef="moviedetail" class="btn btn-primary">Movie Details</a>
 
+    <div class="card-footer movieCardFooter d-flex justify-content-between">
+        @*
+            Favourite toggle button.
+            - Label changes based on the isFavourite state
+            - Calls ToggleFavourite() on click to add or remove from favourites
+        *@
+        <button class="btn btn-outline-primary" @onclick="ToggleFavourite">
+            @(isFavourite ? "Remove Fav" : "Add Fav")
+        </button>
+
+        @* Link to the movie detail page *@
+        <a href="moviedetail" class="btn btn-primary">Movie Details</a>
     </div>
 </div>
 
 @code {
-    [Parameter, EditorRequired] public Movie? Movie { get; set; }
+    // Required parameter - the Movie object to render in this card
+    [Parameter, EditorRequired] public Movie Movie { get; set; } = default!;
 
+    // Tracks whether this movie is currently in the user's favourites list
+    bool isFavourite = false;
+
+    // Runs each time the Movie parameter is set or changes.
+    // Checks FavouritesService to see if the current movie is already a favourite.
+    protected override async Task OnParametersSetAsync()
+    {
+        // Guard against a null Movie parameter before calling the service
+        if (Movie is null) return;
+        isFavourite = await FavouritesService.IsFavouriteAsync(Movie.Id);
+    }
+
+    // Called when the user clicks the favourite button.
+    // Removes the movie from favourites if it's already saved, otherwise adds it.
+    private async Task ToggleFavourite()
+    {
+        if (isFavourite)
+        {
+            // Movie is already a favourite - remove it and update local state
+            await FavouritesService.RemoveFromFavouritesAsync(Movie);
+            isFavourite = false;
+            return;
+        }
+        else
+        {
+            // Movie is not yet a favourite - add it and update local state
+            await FavouritesService.AddToFavouritesAsync(Movie);
+            isFavourite = true;
+        }
+    }
 }
+
+
