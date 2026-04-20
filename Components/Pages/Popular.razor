@@ -56,7 +56,7 @@
         try
         {
             isLoading = true;
-            popularMovies = await TMDBService.GetPopularMovies();
+            popularMovies = await TMDBService.GetPopularMoviesAsync();
 
         }
         catch(Exception ex)

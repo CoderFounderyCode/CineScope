@@ -72,7 +72,7 @@
         try
         {
             isLoading = true;
-            nowPlayingMovies = await TMDBService.GetNowPlayingMovies();
+            nowPlayingMovies = await TMDBService.GetNowPlayingMoviesAsync();
         }
         catch (Exception ex)
         {

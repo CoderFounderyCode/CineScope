@@ -1,4 +1,6 @@
-﻿<nav class="navbar navbar-expand-md navStyle" data-bs-theme="dark" >
+﻿@inject NavigationManager Nav
+
+<nav class="navbar navbar-expand-md navStyle" data-bs-theme="dark">
     <div class="container-xxl">
         <a href="/" class="me-3">
             <img src="/images/devDotnetLogoCenter.png" height="40" />
@@ -11,12 +13,12 @@
             <ul class="navbar-nav mb-lg-0 mb-2 me-auto">
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
-                        <i class="bi bi-house"></i>
+                        <i class="bi bi-house text-success"></i>
                         <span>Home</span>
                     </NavLink>
                 </li>
                 <li class="nav-item">
-                   <NavLink class="nav-link" href="/nowplaying" Match="NavLinkMatch.All">
+                    <NavLink class="nav-link" href="/nowplaying" Match="NavLinkMatch.All">
                         <i class="bi bi-film text-primary"></i>
                         <span>Now Playing</span>
                     </NavLink>
@@ -34,6 +36,28 @@
                     </NavLink>
                 </li>
             </ul>
+            <form class="d-flex" role="search">
+                <i class="bi bi-search text-secondary me-2"></i>
+                <InputText class="form-control form-control-sm me-2" type="search" placeholder="Search movies..." aria-label="Search" DisplayName="query" @bind-Value="Query" />
+                <button class="btn btn-sm btn-primary" type="button" @onclick="HandleSearch">Search</button>
+                <i class="bi bi-search"></i>
+            </form>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
+
+@code {
+
+    private string Query { get; set; } = string.Empty;
+
+    private void HandleSearch()
+    {
+        // Navigate to a search results page with the query as a parameter
+        // Take the Query value and pass it to the search page.
+
+        Nav.NavigateTo(string.IsNullOrEmpty(Query) ? "/search" : $"/search?query={Query}");
+       
+
+    }
+}
+
