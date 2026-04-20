@@ -9,15 +9,38 @@
 <h1>
     <i class="bi bi-film text-primary"></i>
     Movie Details - @MovieId
-</h1>       
+</h1>
+@if (movieDetail is not null)
+{
+    <h2>
+        @movieDetail.Title 
+    </h2>    
+}
 
 @code {
 
     [Parameter]
     public int MovieId { get; set; }
+    bool isLoading = true;
 
-    private MovieDetails? movieDetail;
+    // The fully qualified namespace is required here because this component is also named
+    // 'MovieDetails', which causes an ambiguity. Without it, the compiler resolves
+    // 'MovieDetails' to this component class rather than the intended model class.
+    private CineScope.Models.MovieDetails? movieDetail;
 
-
-   
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            movieDetail = await TMDBService.GetMovieDetailsAsync(MovieId);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error fetching movie details for MovieId {MovieId}: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
 }

@@ -42,7 +42,7 @@ namespace CineScope.Services
             foreach (var movie in response.Results)
             {
                 movie.PosterPath = string.IsNullOrEmpty(movie.PosterPath)
-                    ? "/images/poster.png"
+                    ? "/images/mw1920_pster.png"
                     : $"{ImageBaseUrl}{movie.PosterPath}";
             }
 
@@ -75,23 +75,44 @@ namespace CineScope.Services
         /// <exception cref="HttpIOException">Thrown when the API returns an invalid or null response.</exception>
         public async Task<MovieListResponse> SearchMoviesAsync(string query)
         {
-            string apiUrl = $"https://api.themoviedb.org/3/search/movie?query={query}&region=GB&languages=en";
-            string imageBaseUrl = "https://image.tmdb.org/t/p/w500";
+            string apiUrl = $"https://api.themoviedb.org/3/search/movie?query={Uri.EscapeDataString(query)}&region=GB&languages=en";
 
             MovieListResponse response = await _http.GetFromJsonAsync<MovieListResponse>(apiUrl)
                  ?? throw new HttpIOException(HttpRequestError.InvalidResponse, "Failed to load search results");
 
             foreach (var movie in response.Results)
             {
-                if (string.IsNullOrEmpty(movie.PosterPath))
-                {
-                    movie.PosterPath = "/images/poster.png";
-                }
-                else
-                {
-                    movie.PosterPath = $"{imageBaseUrl}{movie.PosterPath}";
-                }
+                movie.PosterPath = string.IsNullOrEmpty(movie.PosterPath)
+                    ? "/images/poster.png"
+                    : $"{ImageBaseUrl}{movie.PosterPath}";
             }
+
+            return response;
+        }
+
+        /// <summary>
+        /// Retrieves the full details of a specific movie by its TMDB ID.
+        /// </summary>
+        /// <param name="movieId">The TMDB movie ID.</param>
+        /// <returns>A <see cref="CineScope.Models.MovieDetails"/> containing the movie details.</returns>
+        /// <exception cref="HttpIOException">Thrown when the API returns an invalid or null response.</exception>
+        public async Task<CineScope.Models.MovieDetails> GetMovieDetailsAsync(int movieId)
+        {
+            string apiUrl = $"https://api.themoviedb.org/3/movie/{movieId}";
+
+            CineScope.Models.MovieDetails response = await _http.GetFromJsonAsync<CineScope.Models.MovieDetails>(apiUrl)
+                ?? throw new HttpIOException(HttpRequestError.InvalidResponse, "Failed to load movie details");
+
+            if (!string.IsNullOrEmpty(response.PosterPath))
+            {
+                response.PosterPath = $"{ImageBaseUrl}{response.PosterPath}";
+            }
+
+            if (!string.IsNullOrEmpty(response.BackdropPath))
+            {
+                response.BackdropPath = $"{ImageBaseUrl}{response.BackdropPath}";
+            }
+
             return response;
         }
     }
