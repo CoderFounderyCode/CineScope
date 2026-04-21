@@ -42,7 +42,7 @@ namespace CineScope.Services
             foreach (var movie in response.Results)
             {
                 movie.PosterPath = string.IsNullOrEmpty(movie.PosterPath)
-                    ? "/images/mw1920_pster.png"
+                    ? "/images/mw1920_poster.png"
                     : $"{ImageBaseUrl}{movie.PosterPath}";
             }
 
@@ -114,6 +114,24 @@ namespace CineScope.Services
             }
 
             return response;
+        }
+
+        /// <summary>
+        /// Retrieves the first YouTube trailer video for a specific movie by its TMDB ID.
+        /// </summary>
+        /// <param name="movieId">The TMDB movie ID.</param>
+        /// <returns>A <see cref="Video"/> representing the YouTube trailer, or <see langword="null"/> if no trailer is found.</returns>
+        /// <exception cref="HttpIOException">Thrown when the API returns an invalid or null response.</exception>
+        public async Task<Video?> GetMovieTrailersAsync(int movieId)
+        {
+            string apiUrl = $"https://api.themoviedb.org/3/movie/{movieId}/videos?region=GB&languages=en";
+            var videos = await _http.GetFromJsonAsync<MovieTrailerResponse>(apiUrl)
+                ?? throw new HttpIOException(HttpRequestError.InvalidResponse, "Failed to load movie trailers");
+
+            Video? movieTrailer = videos.Results.FirstOrDefault(v => v.Site!.Contains("YouTube", StringComparison.OrdinalIgnoreCase)
+                                                                && v.Type!.Contains("Trailer", StringComparison.OrdinalIgnoreCase));
+
+            return movieTrailer;
         }
     }
 }

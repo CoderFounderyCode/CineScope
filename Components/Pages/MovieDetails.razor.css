@@ -16,3 +16,15 @@
     width: 100%;
     height: auto;
 }
+
+.modal-background{
+    background-color: var(--ddn-theme-900);
+    color: var(--ddn-theme-light-color);
+}
+
+.modal-header button{
+    color: var(--bs-warning);
+    background-color:transparent;
+    border:none;
+    font-size:2rem;
+}
