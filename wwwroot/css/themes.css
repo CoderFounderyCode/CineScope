@@ -1,4 +1,5 @@
 ﻿:root {
+    --ddn-light-color: white;
     --ddn-theme-core: var(--ddn-code-magic-core);
     /* app background */
     --ddn-theme-100: var(--ddn-code-magic-100);
