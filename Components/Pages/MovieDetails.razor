@@ -4,6 +4,7 @@
 *@
 @page "/movie-details/{MovieId:int}"
 @inject TMDBService TMDBService
+@inject IJSRuntime JS
 
 @if (movieDetail is not null)
 {
@@ -92,7 +93,7 @@ else
                                         <i class="bi bi-play"></i>Play Trailer
                                     </button>
                                 </div>
-                            }4444
+                            }
                         </div>
                     </div>
                 </div>
@@ -106,7 +107,7 @@ else
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content modal-background">
             <div class="modal-header">
-                <h5 class="modal-title" id="modal-title">@(movieTrailer.Name ?? "Movie Trailer")</h5>
+                <h5 class="modal-title" id="modal-title">@(movieDetail?.Title ?? "Movie Trailer")</h5>
                 <button type="button" data-bs-dismiss="modal" aria-label="Close" class="ms-auto">
                     <i class="bi bi-x"></i>
                 </button>
@@ -121,13 +122,13 @@ else
             </div>
         </div>
     </div>
-</div>>
+</div>
 
 @code {
 
     [Parameter]
     public int MovieId { get; set; }
-            
+
     bool isLoading = true;
 
     // The fully qualified namespace is required here because this component is also named
@@ -140,6 +141,7 @@ else
     {
         try
         {
+            isLoading = true;
             movieDetail = await TMDBService.GetMovieDetailsAsync(MovieId);
             movieTrailer = await TMDBService.GetMovieTrailersAsync(MovieId);
         }
@@ -150,6 +152,23 @@ else
         finally
         {
             isLoading = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        // Set up event listener for the modal to load the trailer when opened
+        await using var jsmodule = await JS.InvokeAsync<IJSObjectReference>("import", "/Components/pages/MovieDetails.razor.js");
+
+        if(movieTrailer is not null)
+        {
+            string trailerUrl = $"https://www.youtube.com/embed/{movieTrailer.Key}";
+            await jsmodule.InvokeVoidAsync("initVideoPlayer", trailerUrl);
+        }
+        else
+        {
+            await jsmodule.InvokeVoidAsync("initVideoPlayer", "");  
         }
     }
 }
