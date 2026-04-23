@@ -1,0 +1,51 @@
+﻿.swipper-container {
+    position: relative;
+}
+
+    .swipper-container button {
+        position: absolute;
+        color: var(--ddn-theme-800);
+        background-color: var(--ddn-theme-100);
+        border: solid 1px var(--ddn-theme-300);
+        box-shadow: 1px 2px 2px var(--ddn-theme-900);
+        top:calc(50% - 2rem);
+        height: 3rem;
+        width: 3rem;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    .swipper-container .nav-btn-prev{
+        left: 1rem;
+    }
+    .swipper-container .nav-btn-next {
+        right: 1rem;
+    }
+
+    .swipper-content{
+        padding:.5rem 4rem;
+        scroll-behavior:smooth;
+    }
+
+    .swipper-content::-webkit-scrollbar{
+        height:6px
+    }
+
+    .swipper-content::-webkit-scrollbar-track{
+        background-color: grey;
+        border-radius: 3px;
+    }
+
+    .swipper-content::-webkit-scrollbar-thumb{
+        background-color:var(--ddn-theme-800);
+        border-radius:3px;
+    }
+
+    @supports not selector(::-webkit-scrollbar)
+    {
+        .swipper-content{
+            scrollbar-color: grey;
+            scrollbar-width:thin;
+        }
+    }
