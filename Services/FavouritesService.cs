@@ -4,10 +4,15 @@ using CineScope.Models;
 
 namespace CineScope.Services
 {
+    /// <summary>
+    /// Manages a user's favourite movies, persisting them to and retrieving them
+    /// from browser local storage via JavaScript interop.
+    /// </summary>
     public class FavouritesService(IJSRuntime jsRuntime)
     {
-        private readonly string _localStorageKey = "favouriteMovies";
+        private const string LocalStorageKey = "favouriteMovies";
 
+        /// <summary>Raised whenever the favourites list is added to or removed from.</summary>
         public event Action? OnFavouritesChanged;
 
         /// <summary>
@@ -20,12 +25,12 @@ namespace CineScope.Services
             List<Movie> favourites = [];
             try
             {
-                var json = await jsRuntime.InvokeAsync<string>("localStorage.getItem", _localStorageKey);
+                var json = await jsRuntime.InvokeAsync<string>("localStorage.getItem", LocalStorageKey);
                 favourites = JsonSerializer.Deserialize<List<Movie>>(json) ?? [];
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error retrieving favourites: {ex.Message}");
+                Console.Error.WriteLine($"Error retrieving favourites: {ex.Message}");
             }
             return favourites;
         }
@@ -39,11 +44,11 @@ namespace CineScope.Services
             try
             {
                 var json = JsonSerializer.Serialize(movies);
-                await jsRuntime.InvokeVoidAsync("localStorage.setItem", _localStorageKey, json);
+                await jsRuntime.InvokeVoidAsync("localStorage.setItem", LocalStorageKey, json);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error saving favourites: {ex.Message}");
+                Console.Error.WriteLine($"Error saving favourites: {ex.Message}");
             }
         }
 
@@ -62,10 +67,10 @@ namespace CineScope.Services
         }
 
         /// <summary>
-        /// Removes a movie from the favourites list based on its ID. It retrieves the current list of favourites, finds the movie to remove, and updates the list in local storage.
+        /// Removes a movie from the favourites list by its ID,
+        /// saves the updated list to local storage, and notifies subscribers of the change.
         /// </summary>
-        /// <param name="movie"></param>
-        /// <returns></returns>
+        /// <param name="movie">The <see cref="Movie"/> to remove from favourites.</param>
         public async Task RemoveFromFavouritesAsync(Movie movie)
         {
             var favourites = await GetFavouritesAsync();
@@ -74,17 +79,15 @@ namespace CineScope.Services
             OnFavouritesChanged?.Invoke();
         }
 
-
         /// <summary>
-        /// Returns a boolean indicating whether a specific movie is in the favourites list. It retrieves the current list of favourites and checks if any movie in the list matches the provided movie ID.
+        /// Checks whether a specific movie is in the user's favourites list.
         /// </summary>
-        /// <param name="movieId"></param>
-        /// <returns></returns>
+        /// <param name="movieId">The TMDB ID of the movie to check.</param>
+        /// <returns><see langword="true"/> if the movie is a favourite; otherwise <see langword="false"/>.</returns>
         public async Task<bool> IsFavouriteAsync(int movieId)
         {
             var favourites = await GetFavouritesAsync();
-            bool isFavourite = favourites.Any(m => m.Id == movieId);
-            return isFavourite;
+            return favourites.Any(m => m.Id == movieId);
         }
     }
 }

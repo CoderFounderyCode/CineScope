@@ -11,7 +11,7 @@ namespace CineScope.Models
         public string? BackdropPath { get; set; }
 
         [JsonPropertyName("budget")]
-        public int Budget { get; set; }
+        public long Budget { get; set; }
 
         [JsonPropertyName("genres")]
         public Genre[] Genres { get; set; } = [];
@@ -38,7 +38,7 @@ namespace CineScope.Models
         public string Overview { get; set; } = string.Empty;
 
         [JsonPropertyName("popularity")]
-        public float Popularity { get; set; }
+        public double Popularity { get; set; }
 
         [JsonPropertyName("poster_path")]
         public string? PosterPath { get; set; }
@@ -53,7 +53,7 @@ namespace CineScope.Models
         public string ReleaseDate { get; set; } = string.Empty;
 
         [JsonPropertyName("revenue")]
-        public int Revenue { get; set; }
+        public long Revenue { get; set; }
 
         [JsonPropertyName("runtime")]
         public int Runtime { get; set; }
@@ -74,7 +74,7 @@ namespace CineScope.Models
         public bool Video { get; set; }
 
         [JsonPropertyName("vote_average")]
-        public float VoteAverage { get; set; }
+        public double VoteAverage { get; set; }
 
         [JsonPropertyName("vote_count")]
         public int VoteCount { get; set; }

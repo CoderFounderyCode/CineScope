@@ -21,17 +21,12 @@ else
         <div class="justify-content-center align-items-center py-5">
             @if (isLoading)
             {
-                <h2 class="text-muted">
-                    Loading movie detail
-                </h2>
+                <h2 class="text-muted">Loading movie detail</h2>
             }
             else
             {
-                <h2 class="text-muted">
-                    The requested movie detail could not be found.
-                </h2>
+                <h2 class="text-muted">The requested movie detail could not be found.</h2>
             }
-                 
         </div>
     }
     else
@@ -54,10 +49,7 @@ else
                                 }
                                 @if (dateParsed)
                                 {
-                                    <span>
-                                        @releaseDate.ToString("dd MMMM, yyyy") |
-                                        
-                                    </span>
+                                    <span>@releaseDate.ToString("dd MMMM, yyyy") |</span>
                                 }
                                 <span>
                                     @{
@@ -66,23 +58,19 @@ else
                                     }
                                     @hours hour(s) @minutes minutes
                                 </span>
-
-                                      
                             </div>
                             <div class="hstack my-2 gap-2">
                                 @foreach (var genre in movieDetail.Genres)
                                 {
-                                    <span class="badge text-bg-primary">@genre.Name </span>
+                                    <span class="badge text-bg-primary">@genre.Name</span>
                                 }
-
                             </div>
                             <h5 class="lead fw-bold pt-3">Overview</h5>
                             <p>@movieDetail.Overview</p>
-                            <div class="">
+                            <div>
                                 <span>
                                     Viewer rating: @((movieDetail.VoteAverage * 10).ToString("F1"))%
                                 </span>
-
                             </div>
                             @if (!string.IsNullOrEmpty(movieTrailer?.Key))
                             {
@@ -99,18 +87,17 @@ else
                 </div>
             </div>
         </div>
-    }
-    <div class="container-xl py-3">
-        <div class="card">
-            <div class="card-body">
-                <h3 class="card-title">Top Billed Cast</h3>
-                <ActorSwipper />
 
+        @* Cast section is now inside the else block — only renders once movieDetail is loaded *@
+        <div class="container-xl py-3">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Top Billed Cast</h3>
+                    <ActorSwiper Actors="actors" />
+                </div>
             </div>
-
         </div>
-    </div>
-    
+    }
 </div>
 
 <div class="modal" tabindex="-1" id="movie-modal">
@@ -146,6 +133,7 @@ else
     // 'MovieDetails' to this component class rather than the intended model class.
     private CineScope.Models.MovieDetails? movieDetail;
     private Video? movieTrailer;
+    private Cast[]? actors = Array.Empty<Cast>();
 
     protected override async Task OnParametersSetAsync()
     {
@@ -154,6 +142,8 @@ else
             isLoading = true;
             movieDetail = await TMDBService.GetMovieDetailsAsync(MovieId);
             movieTrailer = await TMDBService.GetMovieTrailersAsync(MovieId);
+            var credits = await TMDBService.GetMovieCreditsAsync(MovieId);
+            actors = credits.Cast;
         }
         catch (Exception ex)
         {
@@ -167,18 +157,16 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        // Only run JS setup once, on the first render
+        if (!firstRender) return;
 
-        // Set up event listener for the modal to load the trailer when opened
-        await using var jsmodule = await JS.InvokeAsync<IJSObjectReference>("import", "/Components/pages/MovieDetails.razor.js");
+        await using var jsModule = await JS.InvokeAsync<IJSObjectReference>(
+            "import", "/Components/pages/MovieDetails.razor.js");
 
-        if (movieTrailer is not null)
-        {
-            string trailerUrl = $"https://www.youtube.com/embed/{movieTrailer.Key}";
-            await jsmodule.InvokeVoidAsync("initVideoPlayer", trailerUrl);
-        }
-        else
-        {
-            await jsmodule.InvokeVoidAsync("initVideoPlayer", "");
-        }
+        string trailerUrl = movieTrailer is not null
+            ? $"https://www.youtube.com/embed/{movieTrailer.Key}"
+            : string.Empty;
+
+        await jsModule.InvokeVoidAsync("initVideoPlayer", trailerUrl);
     }
 }

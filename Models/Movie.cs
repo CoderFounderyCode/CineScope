@@ -26,7 +26,7 @@ namespace CineScope.Models
         public string Overview { get; set; } = string.Empty;
 
         [JsonPropertyName("popularity")]
-        public float Popularity { get; set; }
+        public double Popularity { get; set; }
 
         [JsonPropertyName("poster_path")]
         public string? PosterPath { get; set; }
@@ -41,7 +41,7 @@ namespace CineScope.Models
         public bool Video { get; set; }
 
         [JsonPropertyName("vote_average")]
-        public float VoteAverage { get; set; }
+        public double VoteAverage { get; set; }
 
         [JsonPropertyName("vote_count")]
         public int VoteCount { get; set; }

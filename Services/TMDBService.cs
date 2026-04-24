@@ -34,7 +34,7 @@ namespace CineScope.Services
         /// <param name="apiUrl">The full TMDB API URL to request movies from.</param>
         /// <returns>A <see cref="MovieListResponse"/> containing the list of movies with resolved poster paths.</returns>
         /// <exception cref="HttpIOException">Thrown when the API returns an invalid or null response.</exception>
-        private async Task<MovieListResponse> GetMovies(string apiUrl)
+        private async Task<MovieListResponse> GetMoviesAsync(string apiUrl)
         {
             MovieListResponse response = await _http.GetFromJsonAsync<MovieListResponse>(apiUrl)
                 ?? throw new HttpIOException(HttpRequestError.InvalidResponse, "Failed to load movies");
@@ -42,7 +42,7 @@ namespace CineScope.Services
             foreach (var movie in response.Results)
             {
                 movie.PosterPath = string.IsNullOrEmpty(movie.PosterPath)
-                    ? "/images/mw1920_poster.png"
+                    ? "/images/Poster.png"
                     : $"{ImageBaseUrl}{movie.PosterPath}";
             }
 
@@ -55,7 +55,7 @@ namespace CineScope.Services
         /// <returns>A <see cref="MovieListResponse"/> containing now playing movies.</returns>
         public async Task<MovieListResponse> GetNowPlayingMoviesAsync()
         {
-            return await GetMovies("https://api.themoviedb.org/3/movie/now_playing?region=GB&languages=en");
+            return await GetMoviesAsync("https://api.themoviedb.org/3/movie/now_playing?region=GB&languages=en");
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace CineScope.Services
         /// <returns>A <see cref="MovieListResponse"/> containing popular movies.</returns>
         public async Task<MovieListResponse> GetPopularMoviesAsync()
         {
-            return await GetMovies("https://api.themoviedb.org/3/movie/popular?region=GB&languages=en");
+            return await GetMoviesAsync("https://api.themoviedb.org/3/movie/popular?region=GB&languages=en");
         }
 
         /// <summary>
@@ -132,6 +132,29 @@ namespace CineScope.Services
                                                                 && v.Type!.Contains("Trailer", StringComparison.OrdinalIgnoreCase));
 
             return movieTrailer;
+        }
+
+        public async Task<CreditsResponse> GetMovieCreditsAsync(int movieId)
+        {
+            string apiUrl = $"https://api.themoviedb.org/3/movie/{movieId}/credits?region=GB&languages=en";
+            var credits = await _http.GetFromJsonAsync<CreditsResponse>(apiUrl)
+                ?? throw new HttpIOException(HttpRequestError.InvalidResponse, "Failed to load movie credits");
+
+            foreach (var actor in credits.Cast)
+            {
+                actor.ProfilePath = string.IsNullOrEmpty(actor.ProfilePath)
+                    ? "/images/Profile.jpg"
+                    : $"{ImageBaseUrl}{actor.ProfilePath}";
+            }
+
+            foreach (var crew in credits.Crew)
+            {
+                crew.ProfilePath = string.IsNullOrEmpty(crew.ProfilePath)
+                    ? "/images/Profile.jpg"
+                    : $"{ImageBaseUrl}{crew.ProfilePath}";
+            }
+
+            return credits;
         }
     }
 }

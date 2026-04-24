@@ -1,0 +1,21 @@
+﻿@inject IJSRuntime JS
+
+<div class="Swiper-container">
+    <button class="nav-btn-prev">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+    <div class="d-flex flex-grow-1 align-items-center Swiper-content overflow-x-auto">
+        @foreach (var actor in Actors)
+        {
+            <ActorSwiperItem  Actor="actor"/>
+        }
+    </div>
+    <button class="nav-btn-next">
+        <i class="bi bi-chevron-right"></i>
+    </button>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public Cast[] Actors { get; set; } = Array.Empty<Cast>();
+}
