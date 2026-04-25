@@ -24,7 +24,12 @@ namespace CineScope.Services
             string tmdbApiKey = config["TmdbAccessKey"];
             if (!string.IsNullOrEmpty(tmdbApiKey))
             {
+                _http.BaseAddress = new Uri("https://api.themoviedb.org/3/");
                 _http.DefaultRequestHeaders.Add("Authorization", $"Bearer {tmdbApiKey}");
+            }
+            else {
+                // deployed 
+                _http.BaseAddress = new Uri("https://cinescopeplus.netlify.app/" + "tmdb/");
             }
         }
 
@@ -55,7 +60,7 @@ namespace CineScope.Services
         /// <returns>A <see cref="MovieListResponse"/> containing now playing movies.</returns>
         public async Task<MovieListResponse> GetNowPlayingMoviesAsync()
         {
-            return await GetMoviesAsync("https://api.themoviedb.org/3/movie/now_playing?region=GB&languages=en");
+            return await GetMoviesAsync("movie/now_playing?region=GB&languages=en");
         }
 
         /// <summary>
@@ -64,7 +69,7 @@ namespace CineScope.Services
         /// <returns>A <see cref="MovieListResponse"/> containing popular movies.</returns>
         public async Task<MovieListResponse> GetPopularMoviesAsync()
         {
-            return await GetMoviesAsync("https://api.themoviedb.org/3/movie/popular?region=GB&languages=en");
+            return await GetMoviesAsync("movie/popular?region=GB&languages=en");
         }
 
         /// <summary>
@@ -75,7 +80,7 @@ namespace CineScope.Services
         /// <exception cref="HttpIOException">Thrown when the API returns an invalid or null response.</exception>
         public async Task<MovieListResponse> SearchMoviesAsync(string query)
         {
-            string apiUrl = $"https://api.themoviedb.org/3/search/movie?query={Uri.EscapeDataString(query)}&region=GB&languages=en";
+            string apiUrl = $"search/movie?query={Uri.EscapeDataString(query)}&region=GB&languages=en";
 
             MovieListResponse response = await _http.GetFromJsonAsync<MovieListResponse>(apiUrl)
                  ?? throw new HttpIOException(HttpRequestError.InvalidResponse, "Failed to load search results");
@@ -98,7 +103,7 @@ namespace CineScope.Services
         /// <exception cref="HttpIOException">Thrown when the API returns an invalid or null response.</exception>
         public async Task<CineScope.Models.MovieDetails> GetMovieDetailsAsync(int movieId)
         {
-            string apiUrl = $"https://api.themoviedb.org/3/movie/{movieId}";
+            string apiUrl = $"movie/{movieId}";
 
             CineScope.Models.MovieDetails response = await _http.GetFromJsonAsync<CineScope.Models.MovieDetails>(apiUrl)
                 ?? throw new HttpIOException(HttpRequestError.InvalidResponse, "Failed to load movie details");
@@ -124,7 +129,7 @@ namespace CineScope.Services
         /// <exception cref="HttpIOException">Thrown when the API returns an invalid or null response.</exception>
         public async Task<Video?> GetMovieTrailersAsync(int movieId)
         {
-            string apiUrl = $"https://api.themoviedb.org/3/movie/{movieId}/videos?region=GB&languages=en";
+            string apiUrl = $"movie/{movieId}/videos?region=GB&languages=en";
             var videos = await _http.GetFromJsonAsync<MovieTrailerResponse>(apiUrl)
                 ?? throw new HttpIOException(HttpRequestError.InvalidResponse, "Failed to load movie trailers");
 
@@ -136,7 +141,7 @@ namespace CineScope.Services
 
         public async Task<CreditsResponse> GetMovieCreditsAsync(int movieId)
         {
-            string apiUrl = $"https://api.themoviedb.org/3/movie/{movieId}/credits?region=GB&languages=en";
+            string apiUrl = $"movie/{movieId}/credits?region=GB&languages=en";
             var credits = await _http.GetFromJsonAsync<CreditsResponse>(apiUrl)
                 ?? throw new HttpIOException(HttpRequestError.InvalidResponse, "Failed to load movie credits");
 
