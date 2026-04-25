@@ -1,8 +1,8 @@
-﻿.Swiper-container {
+﻿.swiper-container {
     position: relative;
 }
 
-    .Swiper-container button {
+    .swiper-container button {
         position: absolute;
         color: var(--ddn-theme-800);
         background-color: var(--ddn-theme-100);
@@ -16,35 +16,35 @@
         cursor: pointer;
     }
 
-    .Swiper-container .nav-btn-prev{
+    .swiper-container .nav-btn-prev{
         left: 1rem;
     }
-    .Swiper-container .nav-btn-next {
+    .swiper-container .nav-btn-next {
         right: 1rem;
     }
 
-    .Swiper-content{
+    .swiper-content{
         padding:.5rem 4rem;
         scroll-behavior:smooth;
     }
 
-    .Swiper-content::-webkit-scrollbar{
+    .swiper-content::-webkit-scrollbar{
         height:6px
     }
 
-    .Swiper-content::-webkit-scrollbar-track{
+    .swiper-content::-webkit-scrollbar-track{
         background-color: grey;
         border-radius: 3px;
     }
 
-    .Swiper-content::-webkit-scrollbar-thumb{
+    .swiper-content::-webkit-scrollbar-thumb{
         background-color:var(--ddn-theme-800);
         border-radius:3px;
     }
 
     @supports not selector(::-webkit-scrollbar)
     {
-        .Swiper-content{
+        .swiper-content{
             scrollbar-color: grey;
             scrollbar-width:thin;
         }

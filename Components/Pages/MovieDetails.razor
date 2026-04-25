@@ -127,16 +127,15 @@ else
     public int MovieId { get; set; }
 
     bool isLoading = true;
+    private bool _trailerInitialized = false;
 
-    // The fully qualified namespace is required here because this component is also named
-    // 'MovieDetails', which causes an ambiguity. Without it, the compiler resolves
-    // 'MovieDetails' to this component class rather than the intended model class.
     private CineScope.Models.MovieDetails? movieDetail;
     private Video? movieTrailer;
     private Cast[]? actors = Array.Empty<Cast>();
 
     protected override async Task OnParametersSetAsync()
     {
+        _trailerInitialized = false;
         try
         {
             isLoading = true;
@@ -157,16 +156,25 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // Only run JS setup once, on the first render
-        if (!firstRender) return;
+        if (!_trailerInitialized && movieTrailer is not null)
+        {
+            _trailerInitialized = true;
+            await InitializeVideoPlayer();
+        }
+    }
 
-        await using var jsModule = await JS.InvokeAsync<IJSObjectReference>(
-            "import", "/Components/pages/MovieDetails.razor.js");
+    private async Task InitializeVideoPlayer()
+    {
+        await using var jsModule = await JS.InvokeAsync<IJSObjectReference>("import", "/Components/Pages/MovieDetails.razor.js");
 
-        string trailerUrl = movieTrailer is not null
-            ? $"https://www.youtube.com/embed/{movieTrailer.Key}"
-            : string.Empty;
-
-        await jsModule.InvokeVoidAsync("initVideoPlayer", trailerUrl);
+        if (movieTrailer is not null)
+        {
+            string trailerURL = $"https://www.youtube.com/embed/{movieTrailer.Key}";
+            await jsModule.InvokeVoidAsync("initVideoPlayer", trailerURL);
+        }
+        else
+        {
+            await jsModule.InvokeVoidAsync("initVideoPlayer", string.Empty);
+        }
     }
 }

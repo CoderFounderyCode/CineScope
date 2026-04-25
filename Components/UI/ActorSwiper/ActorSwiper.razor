@@ -1,16 +1,17 @@
 ﻿@inject IJSRuntime JS
+@implements IAsyncDisposable
 
-<div class="Swiper-container">
-    <button class="nav-btn-prev">
+<div class="swiper-container" @ref="container">
+    <button class="nav-btn-prev d-none d-sm-block">
         <i class="bi bi-chevron-left"></i>
     </button>
-    <div class="d-flex flex-grow-1 align-items-center Swiper-content overflow-x-auto">
+    <div class="d-flex flex-grow-1 align-items-center swiper-content overflow-x-auto">
         @foreach (var actor in Actors)
         {
-            <ActorSwiperItem  Actor="actor"/>
+            <ActorSwiperItem Actor="actor" />
         }
     </div>
-    <button class="nav-btn-next">
+    <button class="nav-btn-next d-none d-sm-block">
         <i class="bi bi-chevron-right"></i>
     </button>
 </div>
@@ -18,4 +19,23 @@
 @code {
     [Parameter, EditorRequired]
     public Cast[] Actors { get; set; } = Array.Empty<Cast>();
+
+    private ElementReference container;
+    private IJSObjectReference? jsModule;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            jsModule = await JS.InvokeAsync<IJSObjectReference>
+            ("import", "./Components/UI/ActorSwiper/ActorSwiper.razor.js");
+            await jsModule.InvokeVoidAsync("init", container);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (jsModule is not null)
+            await jsModule.DisposeAsync();
+    }
 }
