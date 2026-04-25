@@ -29,7 +29,7 @@ namespace CineScope.Services
             }
             else {
                 // deployed 
-                _http.BaseAddress = new Uri("https://cinescopeplus.netlify.app/" + "tmdb/");
+                _http.BaseAddress = new Uri(_http.BaseAddress + "tmdb/");
             }
         }
 
