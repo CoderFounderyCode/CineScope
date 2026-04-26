@@ -7,7 +7,7 @@ export default async function handler(req) {
   const incoming = new URL(req.url);
 
   // Remove /TMDB prefix
-  const tmdbPath = incoming.pathname.replace(/^\/TMDB/, "");
+  const tmdbPath = incoming.pathname.replace(/^\/tmdb/, "");
 
   // Build TMDB target URL
   const target = new URL(API_URL + tmdbPath);
