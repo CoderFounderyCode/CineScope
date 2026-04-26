@@ -21,7 +21,7 @@ dotnet publish CineScope.csproj -c Release
 
 # Absolute paths
 PUBLISH_DIR="/opt/build/repo/release/wwwroot"
-SOURCE_DIR="/opt/build/repo/bin/Release/net8.0/wwwroot"
+SOURCE_DIR="/opt/build/repo/bin/Release/net8.0/publish/wwwroot"
 REDIRECTS_FILE="/opt/build/repo/_redirects"
 
 echo "DEBUG: Source directory:"
