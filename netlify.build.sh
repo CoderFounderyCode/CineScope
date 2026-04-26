@@ -17,4 +17,4 @@ chmod +x ./dotnet-install.sh
 popd
 
 # Now we can publish (since we've installed .NET in this environment)
-dotnet publish CineScope.csproj -c Release -o output
+dotnet publish CineScope.csproj -c Release -o Release
