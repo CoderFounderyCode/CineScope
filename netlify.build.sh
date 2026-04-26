@@ -1,20 +1,14 @@
-#!/usr/bin/env bash
-set -e
-
-pushd /tmp
-wget https://dot.net/v1/dotnet-install.sh
-chmod +x ./dotnet-install.sh
-./dotnet-install.sh --channel 8.0
-popd
-
-# ALWAYS go to the real repo root
-cd "$(git rev-parse --show-toplevel)"
-
+# Publish the WASM project
 dotnet publish CineScope.csproj -c Release
 
-mkdir -p release/wwwroot
-cp -r bin/Release/net8.0/wwwroot/* release/wwwroot/
-cp _redirects release/wwwroot/
+# Absolute paths so Netlify cannot miss them
+PUBLISH_DIR="/opt/build/repo/release/wwwroot"
+SOURCE_DIR="/opt/build/repo/bin/Release/net8.0/wwwroot"
+REDIRECTS_FILE="/opt/build/repo/_redirects"
 
-echo "DEBUG: Listing release/wwwroot"
-ls -al release/wwwroot
+mkdir -p "$PUBLISH_DIR"
+cp -r "$SOURCE_DIR"/* "$PUBLISH_DIR"/
+cp "$REDIRECTS_FILE" "$PUBLISH_DIR"/
+
+echo "DEBUG: Listing publish directory"
+ls -al "$PUBLISH_DIR"
