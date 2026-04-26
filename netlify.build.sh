@@ -23,5 +23,8 @@ dotnet publish CineScope.csproj -c Release
 mkdir -p release/wwwroot
 cp -r bin/Release/net8.0/wwwroot/* release/wwwroot/
 cp _redirects release/wwwroot/
+echo "DEBUG: Listing release/wwwroot"
+ls -al release/wwwroot
+
 
 
