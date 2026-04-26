@@ -14,7 +14,7 @@ chmod +x ./dotnet-install.sh
 ./dotnet-install.sh --channel 8.0
 
 # Return to project directory
-popd
+cd /opt/build/repo
 
 # Publish the WASM project
 dotnet publish CineScope.csproj -c Release
