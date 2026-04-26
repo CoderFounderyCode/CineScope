@@ -22,4 +22,6 @@ dotnet publish CineScope.csproj -c Release
 # Copy the actual Blazor output to the folder Netlify expects
 mkdir -p release/wwwroot
 cp -r bin/Release/net8.0/wwwroot/* release/wwwroot/
+cp _redirects release/wwwroot/
+
 
