@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 set -e
 
 # Change into a temporary directory so we can download + install .NET
@@ -16,5 +16,10 @@ chmod +x ./dotnet-install.sh
 # Return to project directory
 popd
 
-# Now we can publish (since we've installed .NET in this environment)
-dotnet publish CineScope.csproj -c Release -o Release
+# Publish the WASM project
+dotnet publish CineScope.csproj -c Release
+
+# Copy the actual Blazor output to the folder Netlify expects
+mkdir -p release/wwwroot
+cp -r bin/Release/net8.0/wwwroot/* release/wwwroot/
+
